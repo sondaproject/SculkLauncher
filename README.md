@@ -4,7 +4,7 @@ A repository for the Sculk Minecraft Launcher
 # IMPORTANT: requirements
 you must have a x86_64 stable linux system and two python libs to run this.
 ```
-pip install minecraft-launcher-lib PyQt6
+pip install minecraft-launcher-lib PyQt6 --break-system-packages
 ```
 
 ## What is Sculk Launcher?
