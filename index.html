@@ -1,0 +1,414 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sculk Launcher: offline Minecraft launcher for Windows and Linux</title>
+<meta name="description" content="Sculk is an offline Minecraft launcher for Windows and Linux. Drag and drop mods, shaders and resource packs, map the instances you already have, install any version.">
+<meta name="color-scheme" content="dark">
+<meta property="og:title" content="Sculk Launcher">
+<meta property="og:description" content="Offline Minecraft launcher for Windows and Linux. Drop mods, shaders and packs anywhere.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="assets/poster.jpg">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%209%209%22%3E%3Crect%20width%3D%229%22%20height%3D%229%22%20fill%3D%22%230a0f12%22/%3E%3Crect%20x%3D%223%22%20y%3D%222%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%233be8f0%22/%3E%3Crect%20x%3D%224%22%20y%3D%222%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%233be8f0%22/%3E%3Crect%20x%3D%225%22%20y%3D%222%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%233be8f0%22/%3E%3Crect%20x%3D%226%22%20y%3D%222%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%233be8f0%22/%3E%3Crect%20x%3D%222%22%20y%3D%223%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%2333d2dc%22/%3E%3Crect%20x%3D%223%22%20y%3D%224%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%232cbdc8%22/%3E%3Crect%20x%3D%224%22%20y%3D%224%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%232cbdc8%22/%3E%3Crect%20x%3D%225%22%20y%3D%224%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%232cbdc8%22/%3E%3Crect%20x%3D%226%22%20y%3D%225%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%2324a8b4%22/%3E%3Crect%20x%3D%222%22%20y%3D%226%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%231d93a0%22/%3E%3Crect%20x%3D%223%22%20y%3D%226%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%231d93a0%22/%3E%3Crect%20x%3D%224%22%20y%3D%226%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%231d93a0%22/%3E%3Crect%20x%3D%225%22%20y%3D%226%22%20width%3D%221%22%20height%3D%221%22%20fill%3D%22%231d93a0%22/%3E%3C/svg%3E">
+<style>
+:root{
+  --deepslate:#0a0f12; --panel:#10181d; --vein:#1c2b31; --sculk:#3be8f0; --sculk-dim:#0f3b45;
+  --bone:#cfe0e3; --moss:#7d9aa0; --white:#eefcfd; --ember:#ff6b57;
+  --sans:Inter,"Segoe UI",system-ui,-apple-system,"Noto Sans",Cantarell,sans-serif;
+  --mono:"JetBrains Mono","Cascadia Mono",Consolas,"DejaVu Sans Mono",monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;color-scheme:dark}
+body{margin:0;background:var(--deepslate);color:var(--bone);font:16px/1.65 var(--sans);-webkit-font-smoothing:antialiased}
+#bg{position:fixed;inset:0;z-index:0;pointer-events:none}
+.glow{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(900px 600px at 8% 105%,rgba(59,232,240,.16),transparent 70%)}
+main,header,footer{position:relative;z-index:1}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+a{color:var(--sculk);text-underline-offset:3px}
+a:hover{color:var(--white)}
+:focus-visible{outline:2px solid var(--sculk);outline-offset:3px}
+h1,h2,h3{color:var(--white);line-height:1.15;margin:0}
+h2{font-size:clamp(26px,3.4vw,38px);font-weight:700;margin-bottom:14px}
+p{margin:0 0 14px}
+.muted{color:var(--moss)}
+.skip{position:absolute;left:-999px}
+.skip:focus{left:12px;top:12px;background:var(--panel);padding:8px 12px;z-index:9}
+
+/* top bar */
+.top{display:flex;align-items:center;justify-content:space-between;padding-top:22px;padding-bottom:22px}
+.top svg{height:22px;width:auto;display:block}
+.top nav{display:flex;gap:26px;font-size:15px}
+.top nav a{color:var(--bone);text-decoration:none}
+.top nav a:hover{color:var(--sculk)}
+
+/* hero */
+.hero{display:grid;grid-template-columns:1.02fr .98fr;gap:56px;align-items:center;padding:34px 0 80px}
+.mark{width:min(440px,100%);height:auto;display:block;margin-bottom:26px}
+.mark rect{animation:sweep 7s linear infinite}
+@keyframes sweep{0%,10%,100%{opacity:1;filter:none}3%{opacity:1;filter:brightness(2.2) drop-shadow(0 0 3px #3be8f0)}}
+h1{font-size:clamp(30px,4.2vw,50px);font-weight:750;letter-spacing:-.015em;margin-bottom:18px}
+.lead{font-size:19px;color:var(--bone);max-width:34em;margin-bottom:28px}
+.cta{display:flex;flex-wrap:wrap;gap:14px;align-items:stretch;margin-bottom:14px}
+.btn{display:inline-flex;flex-direction:column;justify-content:center;gap:2px;padding:14px 22px;border:1px solid var(--vein);background:#0e161b;color:var(--white);text-decoration:none;font-weight:650;min-width:230px;transition:border-color .15s,background .15s,transform .15s}
+.btn small{font-weight:400;color:var(--moss);font-size:13px}
+.btn:hover{border-color:var(--sculk);color:var(--white);transform:translateY(-1px)}
+.btn.primary{background:var(--sculk-dim);border-color:var(--sculk)}
+.btn.primary:hover{background:#145664}
+.btn.primary small{color:#9fd9de}
+.note{font-size:14px;color:var(--moss)}
+
+/* mock window */
+.stage{position:relative}
+.mock{border:1px solid var(--vein);background:rgba(14,22,27,.9);box-shadow:0 30px 80px rgba(0,0,0,.45);transition:border-color .15s,box-shadow .15s}
+.mock.hot{border-color:var(--sculk);box-shadow:0 0 0 1px var(--sculk),0 0 50px rgba(59,232,240,.25)}
+.mock-bar{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--vein);font-size:13px;color:var(--moss)}
+.mock-bar b{color:var(--white);font-weight:600}
+.tabs{display:flex;gap:4px;padding:6px 10px 0;border-bottom:1px solid var(--vein)}
+.tab{background:none;border:0;border-bottom:2px solid transparent;color:var(--moss);padding:8px 14px;font:inherit;font-size:14px;cursor:pointer}
+.tab[aria-selected=true]{color:var(--sculk);border-bottom-color:var(--sculk)}
+.tab .n{font-size:12px;opacity:.8;margin-left:4px}
+.zone{margin:14px;padding:22px 12px;border:1px dashed #2a6670;background:rgba(59,232,240,.04);text-align:center;color:#8fe9ee;font-size:14px}
+.mock.hot .zone{background:rgba(59,232,240,.12)}
+.files{list-style:none;margin:0;padding:0 0 8px;min-height:150px}
+.files li{display:flex;justify-content:space-between;gap:12px;padding:9px 18px;border-top:1px solid #131e24;font-size:14px;animation:in .35s ease-out}
+.files li span:last-child{color:var(--moss);font-size:13px}
+.files .empty{color:#4c666c;font-style:italic;animation:none}
+@keyframes in{from{background:rgba(59,232,240,.28)}to{background:transparent}}
+.tray{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px;align-items:center}
+.tray .label{font-size:14px;color:var(--moss);width:100%}
+.chip{touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab;padding:9px 14px;background:#cfe0e3;color:#0a0f12;font-size:14px;font-weight:600;border:2px solid var(--sculk);box-shadow:4px 4px 0 rgba(59,232,240,.35)}
+.chip.used{opacity:.25;cursor:default;box-shadow:none}
+.chip:focus-visible{outline-offset:4px}
+.ghost{position:fixed;z-index:50;pointer-events:none;padding:9px 14px;background:#cfe0e3;color:#0a0f12;font-size:14px;font-weight:600;border:2px solid var(--sculk);box-shadow:6px 6px 0 rgba(59,232,240,.4);transform:translate(12px,12px) rotate(-2deg)}
+.toast{min-height:24px;margin-top:12px;font-size:14px;color:var(--sculk)}
+.reset{background:none;border:0;color:var(--moss);font:inherit;font-size:13px;text-decoration:underline;cursor:pointer;padding:4px 0;margin-left:auto}
+.reset:hover{color:var(--white)}
+
+/* grid children must be allowed to shrink */
+.hero>*,.cols>*,.dl>*{min-width:0}
+
+/* sections */
+section{padding:72px 0;border-top:1px solid rgba(28,43,49,.7)}
+.cols{display:grid;grid-template-columns:.8fr 1.2fr;gap:56px}
+.feat{display:grid;gap:26px}
+.feat div{position:relative;padding-left:30px}
+.feat div::before{content:"";position:absolute;left:0;top:9px;width:12px;height:12px;background:var(--sculk);box-shadow:0 0 0 3px rgba(59,232,240,.2)}
+.feat h3{font-size:19px;margin-bottom:4px}
+.feat p{margin:0;color:var(--bone)}
+video{width:100%;display:block;border:1px solid var(--vein);background:#000;aspect-ratio:16/9}
+
+/* downloads */
+.dl{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:26px}
+.box{border:1px solid var(--vein);background:rgba(14,22,27,.88);padding:26px}
+.box h3{font-size:22px;margin-bottom:6px}
+.box dl{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;margin:16px 0 20px;font-size:14px}
+.box dt{color:var(--moss)}
+.box dd{margin:0;word-break:break-all}
+code,.cmd{font-family:var(--mono);font-size:13px}
+.hash{font-family:var(--mono);font-size:12px;color:var(--moss)}
+.cmd{display:flex;gap:10px;align-items:center;justify-content:space-between;background:#080d10;border:1px solid var(--vein);padding:10px 12px;margin:8px 0;overflow-x:auto}
+.cmd code{white-space:nowrap;color:#bfe9ec}
+.copy{flex:none;background:#0e161b;border:1px solid var(--vein);color:var(--bone);font:inherit;font-size:12px;padding:4px 10px;cursor:pointer}
+.copy:hover{border-color:var(--sculk)}
+.box.hl{border-color:var(--sculk)}
+
+details{border-top:1px solid var(--vein);padding:16px 0}
+details:last-of-type{border-bottom:1px solid var(--vein)}
+summary{cursor:pointer;font-weight:650;color:var(--white);font-size:17px;list-style:none;display:flex;justify-content:space-between;gap:16px}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";color:var(--sculk);font-size:22px;line-height:1}
+details[open] summary::after{content:"\2013"}
+details p{margin:12px 0 0;max-width:46em}
+footer{padding:40px 0 70px;border-top:1px solid rgba(28,43,49,.7);color:var(--moss);font-size:14px}
+footer .wrap{display:flex;flex-wrap:wrap;gap:18px;justify-content:space-between;align-items:center}
+.snd{background:none;border:1px solid var(--vein);color:var(--moss);font:inherit;font-size:13px;padding:5px 10px;cursor:pointer}
+.snd[aria-pressed=true]{color:var(--sculk);border-color:var(--sculk)}
+
+@media (max-width:900px){
+  .hero,.cols,.dl{grid-template-columns:1fr}
+  .hero{gap:40px;padding-bottom:56px}
+  .top nav{gap:16px;font-size:14px}
+  .btn{min-width:0;flex:1 1 220px}
+}
+@media (max-width:520px){ .top nav a:nth-child(n+3){display:none} section{padding:52px 0} }
+@media (prefers-reduced-motion:reduce){ .mark rect{animation:none} html{scroll-behavior:auto} .files li{animation:none} }
+</style>
+</head>
+<body>
+<a class="skip" href="#download">Skip to downloads</a>
+<canvas id="bg" aria-hidden="true"></canvas><div class="glow" aria-hidden="true"></div>
+
+<header class="wrap top">
+  <svg class="mini" viewBox="0 0 29 5" role="img" aria-label="Sculk" shape-rendering="crispEdges"><rect x="1" y="0" width="0.9" height="0.9" fill="#3be8f0"/><rect x="2" y="0" width="0.9" height="0.9" fill="#3be8f0"/><rect x="3" y="0" width="0.9" height="0.9" fill="#3be8f0"/><rect x="4" y="0" width="0.9" height="0.9" fill="#3be8f0"/><rect x="0" y="1" width="0.9" height="0.9" fill="#33d2dc"/><rect x="1" y="2" width="0.9" height="0.9" fill="#2cbdc8"/><rect x="2" y="2" width="0.9" height="0.9" fill="#2cbdc8"/><rect x="3" y="2" width="0.9" height="0.9" fill="#2cbdc8"/><rect x="4" y="3" width="0.9" height="0.9" fill="#24a8b4"/><rect x="0" y="4" width="0.9" height="0.9" fill="#1d93a0"/><rect x="1" y="4" width="0.9" height="0.9" fill="#1d93a0"/><rect x="2" y="4" width="0.9" height="0.9" fill="#1d93a0"/><rect x="3" y="4" width="0.9" height="0.9" fill="#1d93a0"/><rect x="7" y="0" width="0.9" height="0.9" fill="#3be8f0"/><rect x="8" y="0" width="0.9" height="0.9" fill="#3be8f0"/><rect x="9" y="0" width="0.9" height="0.9" fill="#3be8f0"/><rect x="10" y="0" width="0.9" height="0.9" fill="#3be8f0"/><rect x="6" y="1" width="0.9" height="0.9" fill="#33d2dc"/><rect x="6" y="2" width="0.9" height="0.9" fill="#2cbdc8"/><rect x="6" y="3" width="0.9" height="0.9" fill="#24a8b4"/><rect x="7" y="4" width="0.9" height="0.9" fill="#1d93a0"/><rect x="8" y="4" width="0.9" height="0.9" fill="#1d93a0"/><rect x="9" y="4" width="0.9" height="0.9" fill="#1d93a0"/><rect x="10" y="4" width="0.9" height="0.9" fill="#1d93a0"/><rect x="12" y="0" width="0.9" height="0.9" fill="#3be8f0"/><rect x="16" y="0" width="0.9" height="0.9" fill="#3be8f0"/><rect x="12" y="1" width="0.9" height="0.9" fill="#33d2dc"/><rect x="16" y="1" width="0.9" height="0.9" fill="#33d2dc"/><rect x="12" y="2" width="0.9" height="0.9" fill="#2cbdc8"/><rect x="16" y="2" width="0.9" height="0.9" fill="#2cbdc8"/><rect x="12" y="3" width="0.9" height="0.9" fill="#24a8b4"/><rect x="16" y="3" width="0.9" height="0.9" fill="#24a8b4"/><rect x="13" y="4" width="0.9" height="0.9" fill="#1d93a0"/><rect x="14" y="4" width="0.9" height="0.9" fill="#1d93a0"/><rect x="15" y="4" width="0.9" height="0.9" fill="#1d93a0"/><rect x="18" y="0" width="0.9" height="0.9" fill="#3be8f0"/><rect x="18" y="1" width="0.9" height="0.9" fill="#33d2dc"/><rect x="18" y="2" width="0.9" height="0.9" fill="#2cbdc8"/><rect x="18" y="3" width="0.9" height="0.9" fill="#24a8b4"/><rect x="18" y="4" width="0.9" height="0.9" fill="#1d93a0"/><rect x="19" y="4" width="0.9" height="0.9" fill="#1d93a0"/><rect x="20" y="4" width="0.9" height="0.9" fill="#1d93a0"/><rect x="21" y="4" width="0.9" height="0.9" fill="#1d93a0"/><rect x="22" y="4" width="0.9" height="0.9" fill="#1d93a0"/><rect x="24" y="0" width="0.9" height="0.9" fill="#3be8f0"/><rect x="28" y="0" width="0.9" height="0.9" fill="#3be8f0"/><rect x="24" y="1" width="0.9" height="0.9" fill="#33d2dc"/><rect x="27" y="1" width="0.9" height="0.9" fill="#33d2dc"/><rect x="24" y="2" width="0.9" height="0.9" fill="#2cbdc8"/><rect x="25" y="2" width="0.9" height="0.9" fill="#2cbdc8"/><rect x="26" y="2" width="0.9" height="0.9" fill="#2cbdc8"/><rect x="24" y="3" width="0.9" height="0.9" fill="#24a8b4"/><rect x="27" y="3" width="0.9" height="0.9" fill="#24a8b4"/><rect x="24" y="4" width="0.9" height="0.9" fill="#1d93a0"/><rect x="28" y="4" width="0.9" height="0.9" fill="#1d93a0"/></svg>
+  <nav aria-label="Main">
+    <a href="#try">Try it</a><a href="#features">Features</a><a href="#download">Download</a><a href="#faq">FAQ</a>
+  </nav>
+</header>
+
+<main>
+<div class="wrap">
+  <div class="hero">
+    <div>
+      <svg class="mark" viewBox="0 0 29 5" role="img" aria-label="Sculk" shape-rendering="crispEdges"><rect x="1" y="0" width="0.9" height="0.9" fill="#3be8f0" style="animation-delay:0.04s"/><rect x="2" y="0" width="0.9" height="0.9" fill="#3be8f0" style="animation-delay:0.09s"/><rect x="3" y="0" width="0.9" height="0.9" fill="#3be8f0" style="animation-delay:0.14s"/><rect x="4" y="0" width="0.9" height="0.9" fill="#3be8f0" style="animation-delay:0.18s"/><rect x="0" y="1" width="0.9" height="0.9" fill="#33d2dc" style="animation-delay:0.00s"/><rect x="1" y="2" width="0.9" height="0.9" fill="#2cbdc8" style="animation-delay:0.04s"/><rect x="2" y="2" width="0.9" height="0.9" fill="#2cbdc8" style="animation-delay:0.09s"/><rect x="3" y="2" width="0.9" height="0.9" fill="#2cbdc8" style="animation-delay:0.14s"/><rect x="4" y="3" width="0.9" height="0.9" fill="#24a8b4" style="animation-delay:0.18s"/><rect x="0" y="4" width="0.9" height="0.9" fill="#1d93a0" style="animation-delay:0.00s"/><rect x="1" y="4" width="0.9" height="0.9" fill="#1d93a0" style="animation-delay:0.04s"/><rect x="2" y="4" width="0.9" height="0.9" fill="#1d93a0" style="animation-delay:0.09s"/><rect x="3" y="4" width="0.9" height="0.9" fill="#1d93a0" style="animation-delay:0.14s"/><rect x="7" y="0" width="0.9" height="0.9" fill="#3be8f0" style="animation-delay:0.32s"/><rect x="8" y="0" width="0.9" height="0.9" fill="#3be8f0" style="animation-delay:0.36s"/><rect x="9" y="0" width="0.9" height="0.9" fill="#3be8f0" style="animation-delay:0.40s"/><rect x="10" y="0" width="0.9" height="0.9" fill="#3be8f0" style="animation-delay:0.45s"/><rect x="6" y="1" width="0.9" height="0.9" fill="#33d2dc" style="animation-delay:0.27s"/><rect x="6" y="2" width="0.9" height="0.9" fill="#2cbdc8" style="animation-delay:0.27s"/><rect x="6" y="3" width="0.9" height="0.9" fill="#24a8b4" style="animation-delay:0.27s"/><rect x="7" y="4" width="0.9" height="0.9" fill="#1d93a0" style="animation-delay:0.32s"/><rect x="8" y="4" width="0.9" height="0.9" fill="#1d93a0" style="animation-delay:0.36s"/><rect x="9" y="4" width="0.9" height="0.9" fill="#1d93a0" style="animation-delay:0.40s"/><rect x="10" y="4" width="0.9" height="0.9" fill="#1d93a0" style="animation-delay:0.45s"/><rect x="12" y="0" width="0.9" height="0.9" fill="#3be8f0" style="animation-delay:0.54s"/><rect x="16" y="0" width="0.9" height="0.9" fill="#3be8f0" style="animation-delay:0.72s"/><rect x="12" y="1" width="0.9" height="0.9" fill="#33d2dc" style="animation-delay:0.54s"/><rect x="16" y="1" width="0.9" height="0.9" fill="#33d2dc" style="animation-delay:0.72s"/><rect x="12" y="2" width="0.9" height="0.9" fill="#2cbdc8" style="animation-delay:0.54s"/><rect x="16" y="2" width="0.9" height="0.9" fill="#2cbdc8" style="animation-delay:0.72s"/><rect x="12" y="3" width="0.9" height="0.9" fill="#24a8b4" style="animation-delay:0.54s"/><rect x="16" y="3" width="0.9" height="0.9" fill="#24a8b4" style="animation-delay:0.72s"/><rect x="13" y="4" width="0.9" height="0.9" fill="#1d93a0" style="animation-delay:0.58s"/><rect x="14" y="4" width="0.9" height="0.9" fill="#1d93a0" style="animation-delay:0.63s"/><rect x="15" y="4" width="0.9" height="0.9" fill="#1d93a0" style="animation-delay:0.67s"/><rect x="18" y="0" width="0.9" height="0.9" fill="#3be8f0" style="animation-delay:0.81s"/><rect x="18" y="1" width="0.9" height="0.9" fill="#33d2dc" style="animation-delay:0.81s"/><rect x="18" y="2" width="0.9" height="0.9" fill="#2cbdc8" style="animation-delay:0.81s"/><rect x="18" y="3" width="0.9" height="0.9" fill="#24a8b4" style="animation-delay:0.81s"/><rect x="18" y="4" width="0.9" height="0.9" fill="#1d93a0" style="animation-delay:0.81s"/><rect x="19" y="4" width="0.9" height="0.9" fill="#1d93a0" style="animation-delay:0.85s"/><rect x="20" y="4" width="0.9" height="0.9" fill="#1d93a0" style="animation-delay:0.90s"/><rect x="21" y="4" width="0.9" height="0.9" fill="#1d93a0" style="animation-delay:0.94s"/><rect x="22" y="4" width="0.9" height="0.9" fill="#1d93a0" style="animation-delay:0.99s"/><rect x="24" y="0" width="0.9" height="0.9" fill="#3be8f0" style="animation-delay:1.08s"/><rect x="28" y="0" width="0.9" height="0.9" fill="#3be8f0" style="animation-delay:1.26s"/><rect x="24" y="1" width="0.9" height="0.9" fill="#33d2dc" style="animation-delay:1.08s"/><rect x="27" y="1" width="0.9" height="0.9" fill="#33d2dc" style="animation-delay:1.21s"/><rect x="24" y="2" width="0.9" height="0.9" fill="#2cbdc8" style="animation-delay:1.08s"/><rect x="25" y="2" width="0.9" height="0.9" fill="#2cbdc8" style="animation-delay:1.12s"/><rect x="26" y="2" width="0.9" height="0.9" fill="#2cbdc8" style="animation-delay:1.17s"/><rect x="24" y="3" width="0.9" height="0.9" fill="#24a8b4" style="animation-delay:1.08s"/><rect x="27" y="3" width="0.9" height="0.9" fill="#24a8b4" style="animation-delay:1.21s"/><rect x="24" y="4" width="0.9" height="0.9" fill="#1d93a0" style="animation-delay:1.08s"/><rect x="28" y="4" width="0.9" height="0.9" fill="#1d93a0" style="animation-delay:1.26s"/></svg>
+      <h1>An offline Minecraft launcher for Windows and Linux</h1>
+      <p class="lead">Drop mods, shaders and resource packs anywhere on the window and they land in the right folder. It finds the instances you already have, installs any version, and runs without a connection once you are set up. for source file, please check <a href="https://https://github.com/sondaproject/SculkLauncher"> sondaproject's github</a></p>
+      <div class="cta">
+        <a class="btn primary" id="btn-win" href="https://github.com/sondaproject/SculkLauncher/releases/download/sculk/SculkLauncher-build1.exe" download>Download for Windows<small>SculkLauncher.exe, 35 MB, v1.1</small></a>
+        <a class="btn" id="btn-lin" href="#download">Linux and source<small>AppImage</small></a>
+      </div>
+      <p class="note">Free. Windows 10 or later. Made by sondaproject.</p>
+    </div>
+
+    <div class="stage" id="try">
+      <div class="mock" id="mock" aria-label="Interactive demo of the Library tab">
+        <div class="mock-bar"><b>Sculk Launcher</b><span>Library, Create Fabric Pack</span></div>
+        <div class="tabs" role="tablist" aria-label="Library tabs">
+          <button class="tab" role="tab" data-tab="mods" aria-selected="true">Mods<span class="n" id="n-mods">0</span></button>
+          <button class="tab" role="tab" data-tab="shaders" aria-selected="false">Shaders<span class="n" id="n-shaders">0</span></button>
+          <button class="tab" role="tab" data-tab="packs" aria-selected="false">Resource packs<span class="n" id="n-packs">0</span></button>
+        </div>
+        <div class="zone">Drop files here, or anywhere on this window.</div>
+        <ul class="files" id="files" aria-live="polite"></ul>
+      </div>
+      <div class="tray" id="tray">
+        <span class="label">Drag these into the window. Or drop real files from your desktop; nothing leaves your browser.</span>
+        <span class="chip" tabindex="0" role="button" data-kind="mods" data-name="sodium-fabric-0.5.8.jar" data-size="1.1 MB">sodium-fabric-0.5.8.jar</span>
+        <span class="chip" tabindex="0" role="button" data-kind="shaders" data-name="Complementary Reimagined.zip" data-size="2.0 MB">Complementary Reimagined.zip</span>
+        <span class="chip" tabindex="0" role="button" data-kind="packs" data-name="Faithful 64x.zip" data-size="3.4 MB">Faithful 64x.zip</span>
+        <button class="reset" id="reset" type="button">Reset</button>
+      </div>
+      <div class="toast" id="toast" role="status"></div>
+    </div>
+  </div>
+</div>
+
+<section id="features"><div class="wrap cols">
+  <div>
+    <h2>Built around what you actually do</h2>
+    <p class="muted">The launcher stays out of the way. Everything below works from one window, and nothing is copied until you drop it in.</p>
+  </div>
+  <div class="feat">
+    <div><h3>Drop anywhere</h3><p>A .jar goes to mods. A .zip is opened and checked: a shaders folder means shader pack, a pack.mcmeta or assets folder means resource pack. Switch mods off without deleting them.</p></div>
+    <div><h3>Finds the instances you already have</h3><p>Maps Prism, MultiMC, PolyMC, CurseForge, Modrinth App and the official .minecraft folder in place. Point it at any other folder and it will take that too.</p></div>
+    <div><h3>Any version, any loader</h3><p>Install releases, snapshots or old betas, with Fabric, Quilt, Forge or NeoForge, straight from Mojang. The version list is cached, so the Download tab still opens offline.</p></div>
+    <div><h3>Modpacks</h3><p>Drop a .mrpack file and it installs as a new instance, loader and all.</p></div>
+    <div><h3>The free demo build</h3><p>Turn on Demo mode per instance to run Mojang's own free trial build. No account needed.</p></div>
+    <div><h3>It listens</h3><p>Every drop, launch and install sends a pixel ripple across the background, like a sculk sensor picking up a step. It costs nothing while idle.</p></div>
+  </div>
+</div></section>
+
+<section id="video"><div class="wrap">
+  <h2>See it in 40 seconds</h2>
+  <p class="muted">A quick tour: dropping files, mapping instances, installing a version, pressing Play.</p>
+  <video controls preload="metadata" poster="assets/poster.jpg"><source src="assets/sculk_launcher_intro.mp4" type="video/mp4">Your browser can't play this video. <a href="assets/sculk_launcher_intro.mp4">Download it instead.</a></video>
+</div></section>
+
+<section id="download"><div class="wrap">
+  <h2>Download</h2>
+  <p class="muted">Version 1.1. The same app on both systems.</p>
+  <div class="dl">
+    <div class="box" id="box-win">
+      <h3>Windows</h3>
+      <p>A single portable .exe. No installer, no admin rights. Run it from anywhere.</p>
+      <dl>
+        <dt>File</dt><dd>SculkLauncher.exe (35 MB)</dd>
+        <dt>Needs</dt><dd>Windows 10 or later, 64-bit</dd>
+        <dt>SHA-256</dt><dd class="hash">5681e59718f12f1f628bf667dace83695a39413d4f329fb470a81b0d5cf6e36a</dd>
+      </dl>
+      <a class="btn primary" href="downloads/SculkLauncher.exe" download>Download SculkLauncher.exe<small>or check the hash first, see FAQ</small></a>
+    </div>
+    <div class="box" id="box-lin">
+      <h3>Linux and source</h3>
+      <p>AppImage File. Needs Python 3.10 or later.</p>
+      <div class="cmd"><code>pip install minecraft-launcher-lib PyQt6</code><button class="copy" type="button" data-copy="pip install minecraft-launcher-lib PyQt6">Copy</button></div>
+      <div class="cmd"><code>python3 sculk_launcher.py</code><button class="copy" type="button" data-copy="python3 sculk_launcher.py">Copy</button></div>
+      <p class="note">On Arch or Artix: <code>sudo pacman -S python-pyqt6</code>, then pip install the launcher library in a venv made with <code>--system-site-packages</code>.</p>
+      <dl>
+        <dt>File</dt><dd>sculk_launcher.py (59 KB)</dd>
+        <dt>SHA-256</dt><dd class="hash">994e41586e7c3409395e604753629b56bc0c06697b69c78ff33483d29eeab864</dd>
+      </dl>
+      <a class="btn" href="https://github.com/sondaproject/SculkLauncher/releases/download/sculk/SculkLauncher-Build1.AppImage" download>Download SculkLauncher-build1.AppImage<small>same code the Windows build is made from</small></a>
+    </div>
+  </div>
+</div></section>
+
+<section id="faq"><div class="wrap cols">
+  <div><h2>Questions</h2><p class="muted">Short answers, including the awkward ones.</p></div>
+  <div>
+    <details><summary>Windows says "Windows protected your PC". Is it safe?</summary>
+      <p>The .exe is not code-signed, because signing certificates cost money and this is a hobby project, so SmartScreen warns about any unknown file. Compare the SHA-256 above with the file you downloaded (in PowerShell: <code>Get-FileHash .\SculkLauncher.exe</code>). Or skip the .exe entirely and run the Python source, which is a single file you can read.</p></details>
+    <details><summary>How do accounts work? Can I join any server?</summary>
+      <p>Sculk signs in offline, using the player name you type. That is enough for singleplayer, LAN and servers that run in offline mode. Servers that check Mojang accounts will refuse it, and the launcher does nothing to get around that. If you enjoy the game, buy it and support Mojang.</p></details>
+    <details><summary>What is Demo mode?</summary>
+      <p>It starts Minecraft with Mojang's own demo flag, the official free trial. It needs no account at all.</p></details>
+    <details><summary>Does it need Java installed?</summary>
+      <p>Usually not. When Sculk installs a version it also downloads the Java runtime Mojang ships for it. You can point it at your own Java in Settings.</p></details>
+    <details><summary>Will it mess with my Prism or CurseForge instances?</summary>
+      <p>No. Existing instances are mapped in place and nothing is copied or rewritten. Files only change when you launch one or drop something into it. Removing a mapped instance from the list only hides it.</p></details>
+    <details><summary>Where does it keep its own files?</summary>
+      <p>Windows: <code>%LOCALAPPDATA%\SculkLauncher</code>, settings in <code>%APPDATA%\SculkLauncher</code>. Linux: <code>~/.local/share/sculk-launcher</code> and <code>~/.config/sculk-launcher</code>.</p></details>
+    <details><summary>Is this made by Mojang?</summary>
+      <p>No. Sculk is an unofficial fan project and is not affiliated with Mojang or Microsoft. Minecraft is a trademark of Mojang Synergies AB.</p></details>
+  </div>
+</div></section>
+</main>
+
+<footer><div class="wrap">
+  <span>Sculk Launcher by sondaproject. Unofficial; not affiliated with Mojang or Microsoft.</span>
+  <span><a href="https://www.youtube.com/results?search_query=sondaproject" rel="noopener">Find sondaproject on YouTube</a></span>
+  <button class="snd" id="snd" type="button" aria-pressed="false">Sound: off</button>
+</div></footer>
+
+<script>
+(() => {
+  const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------- sculk grid background: pixel-ring ripples, idle = no animation ---------- */
+  const cv = $('#bg'), ctx = cv.getContext('2d'), C = 24;
+  let W = 0, H = 0, ripples = [], raf = 0;
+  function size() {
+    const dpr = Math.min(devicePixelRatio || 1, 2);
+    W = innerWidth; H = innerHeight;
+    cv.width = W * dpr; cv.height = H * dpr; cv.style.width = W + 'px'; cv.style.height = H + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0); draw();
+  }
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    ctx.strokeStyle = 'rgba(59,232,240,0.055)'; ctx.lineWidth = 1; ctx.beginPath();
+    for (let x = 0; x <= W; x += C) { ctx.moveTo(x + .5, 0); ctx.lineTo(x + .5, H); }
+    for (let y = 0; y <= H; y += C) { ctx.moveTo(0, y + .5); ctx.lineTo(W, y + .5); }
+    ctx.stroke();
+    const lim = Math.hypot(W, H) * .7;
+    for (const r of ripples) {
+      const fade = Math.max(0, 1 - r.r / lim), n = Math.max(12, Math.floor(2 * Math.PI * r.r / C * 2)), seen = new Set();
+      ctx.fillStyle = `rgba(59,232,240,${(0.42 * fade * r.s).toFixed(3)})`;
+      for (let i = 0; i < n; i++) {
+        const a = 2 * Math.PI * i / n, gx = Math.floor((r.x + r.r * Math.cos(a)) / C), gy = Math.floor((r.y + r.r * Math.sin(a)) / C), k = gx + ',' + gy;
+        if (!seen.has(k)) { seen.add(k); ctx.fillRect(gx * C + 1, gy * C + 1, C - 1, C - 1); }
+      }
+    }
+  }
+  function tick() {
+    const lim = Math.hypot(W, H) * .7;
+    ripples.forEach(r => r.r += 7); ripples = ripples.filter(r => r.r < lim); draw();
+    raf = ripples.length ? requestAnimationFrame(tick) : 0;
+  }
+  function ripple(x, y, s = 1) { if (reduce) return; ripples.push({ x, y, r: 0, s }); if (!raf) raf = requestAnimationFrame(tick); }
+  addEventListener('resize', size); size();
+  addEventListener('pointerdown', e => { if (e.pointerType !== 'touch' || true) ripple(e.clientX, e.clientY, .8); });
+
+  /* ---------- optional ping ---------- */
+  let sound = false, actx = null;
+  function ping(f = 660, v = .12) {
+    if (!sound) return;
+    try {
+      actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+      const t = actx.currentTime;
+      [[1, 1], [2.01, .4], [3.02, .2]].forEach(([m, a]) => {
+        const o = actx.createOscillator(), g = actx.createGain();
+        o.frequency.value = f * m; o.type = 'sine';
+        g.gain.setValueAtTime(v * a, t); g.gain.exponentialRampToValueAtTime(.0001, t + 1.1);
+        o.connect(g).connect(actx.destination); o.start(t); o.stop(t + 1.2);
+      });
+    } catch (_) {}
+  }
+  const snd = $('#snd');
+  snd.addEventListener('click', () => { sound = !sound; snd.setAttribute('aria-pressed', sound); snd.textContent = 'Sound: ' + (sound ? 'on' : 'off'); ping(520); });
+
+  /* ---------- drop demo ---------- */
+  const mock = $('#mock'), filesEl = $('#files'), toast = $('#toast');
+  const lists = { mods: [], shaders: [], packs: [] }, label = { mods: 'mods', shaders: 'shaders', packs: 'resource packs' };
+  let tab = 'mods', toastT = 0;
+  function say(msg) { toast.textContent = msg; clearTimeout(toastT); toastT = setTimeout(() => toast.textContent = '', 6000); }
+  function render() {
+    filesEl.textContent = '';
+    if (!lists[tab].length) { const li = document.createElement('li'); li.className = 'empty'; li.textContent = 'Nothing here yet. Drop something.'; filesEl.append(li); }
+    for (const f of lists[tab]) {
+      const li = document.createElement('li'), a = document.createElement('span'), b = document.createElement('span');
+      a.textContent = f.name; b.textContent = f.size; li.append(a, b); filesEl.append(li);
+    }
+    for (const k in lists) $('#n-' + k).textContent = lists[k].length;
+    $$('.tab').forEach(t => t.setAttribute('aria-selected', t.dataset.tab === tab));
+  }
+  function add(kind, name, size, x, y) {
+    if (lists[kind].some(f => f.name === name)) return false;
+    lists[kind].push({ name, size }); tab = kind; render();
+    const r = mock.getBoundingClientRect();
+    ripple(x ?? r.left + r.width / 2, y ?? r.top + r.height / 2);
+    ping({ mods: 520, shaders: 660, packs: 780 }[kind]);
+    return true;
+  }
+  $$('.tab').forEach(t => t.addEventListener('click', () => { tab = t.dataset.tab; render(); }));
+  $('#reset').addEventListener('click', () => { for (const k in lists) lists[k] = []; tab = 'mods'; $$('.chip').forEach(c => c.classList.remove('used')); toast.textContent = ''; render(); });
+
+  const overMock = (x, y) => { const r = mock.getBoundingClientRect(); return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom; };
+  function chipAdd(chip, x, y) {
+    if (chip.classList.contains('used')) return;
+    if (add(chip.dataset.kind, chip.dataset.name, chip.dataset.size, x, y)) {
+      chip.classList.add('used'); say(`Added to ${label[chip.dataset.kind]}: sorted by what is inside the file.`);
+    }
+  }
+  $$('.chip').forEach(chip => {
+    let ghost = null, sx = 0, sy = 0, moved = false;
+    chip.addEventListener('pointerdown', e => {
+      if (chip.classList.contains('used')) return;
+      sx = e.clientX; sy = e.clientY; moved = false; chip.setPointerCapture(e.pointerId);
+      ghost = document.createElement('div'); ghost.className = 'ghost'; ghost.textContent = chip.textContent; ghost.hidden = true; document.body.append(ghost);
+    });
+    chip.addEventListener('pointermove', e => {
+      if (!ghost) return;
+      if (!moved && Math.hypot(e.clientX - sx, e.clientY - sy) > 6) { moved = true; ghost.hidden = false; }
+      ghost.style.left = e.clientX + 'px'; ghost.style.top = e.clientY + 'px';
+      mock.classList.toggle('hot', moved && overMock(e.clientX, e.clientY));
+    });
+    const end = e => {
+      if (!ghost) return;
+      ghost.remove(); ghost = null; mock.classList.remove('hot');
+      if (!moved) chipAdd(chip, undefined, undefined);
+      else if (overMock(e.clientX, e.clientY)) chipAdd(chip, e.clientX, e.clientY);
+    };
+    chip.addEventListener('pointerup', end);
+    chip.addEventListener('pointercancel', () => { if (ghost) { ghost.remove(); ghost = null; mock.classList.remove('hot'); } });
+    chip.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); chipAdd(chip); } });
+  });
+
+  /* real files from the desktop: classified by name only, never uploaded */
+  const fmt = n => n < 1048576 ? (n / 1024).toFixed(0) + ' KB' : (n / 1048576).toFixed(1) + ' MB';
+  ['dragenter', 'dragover'].forEach(ev => mock.addEventListener(ev, e => { if ([...(e.dataTransfer?.types || [])].includes('Files')) { e.preventDefault(); mock.classList.add('hot'); } }));
+  mock.addEventListener('dragleave', () => mock.classList.remove('hot'));
+  mock.addEventListener('drop', e => {
+    e.preventDefault(); mock.classList.remove('hot');
+    let got = 0, skipped = 0;
+    for (const f of e.dataTransfer.files) {
+      const n = f.name.toLowerCase(); let kind = null;
+      if (n.endsWith('.jar')) kind = 'mods';
+      else if (n.endsWith('.zip')) kind = /shader|bsl|complementary|seus|sildur|iris|chocapic|miniature/.test(n) ? 'shaders' : 'packs';
+      if (kind && add(kind, f.name, fmt(f.size), e.clientX, e.clientY)) got++; else skipped++;
+    }
+    say(got ? `Added ${got} file${got > 1 ? 's' : ''}. Here I only guess from the name; the real launcher looks inside the zip.` : 'Nothing added. Try a .jar or a .zip.');
+  });
+  addEventListener('dragover', e => { if (!mock.contains(e.target)) e.preventDefault(); });
+  addEventListener('drop', e => { if (!mock.contains(e.target)) e.preventDefault(); });
+  render();
+
+  /* ---------- copy buttons ---------- */
+  $$('.copy').forEach(b => b.addEventListener('click', async () => {
+    const t = b.dataset.copy;
+    try { await navigator.clipboard.writeText(t); } catch (_) { const a = document.createElement('textarea'); a.value = t; document.body.append(a); a.select(); document.execCommand('copy'); a.remove(); }
+    const old = b.textContent; b.textContent = 'Copied'; setTimeout(() => b.textContent = old, 1400);
+    const r = b.getBoundingClientRect(); ripple(r.left + r.width / 2, r.top + r.height / 2, .6); ping(740, .08);
+  }));
+
+  /* ---------- pick the right download for the visitor ---------- */
+  const isLinux = /Linux|X11/.test(navigator.userAgent) && !/Android/.test(navigator.userAgent);
+  if (isLinux) {
+    const w = $('#btn-win'), l = $('#btn-lin');
+    w.classList.remove('primary'); l.classList.add('primary'); $('#box-lin').classList.add('hl');
+    l.firstChild.textContent = 'Get it for Linux';
+  } else { $('#box-win').classList.add('hl'); }
+})();
+</script>
+</body>
+</html>
